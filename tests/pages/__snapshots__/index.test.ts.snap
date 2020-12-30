@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/index should render 1`] = `
+<v-layout column="" justify-center="" align-center="">
+  <posts-stub></posts-stub>
+</v-layout>
+`;

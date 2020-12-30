@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.20.0]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests with ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v1
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: yarn install
+        env:
+          CONTENTFUL_JSON: ${{ secrets.CONTENTFUL_JSON }}
+        run: |
+          echo "$CONTENTFUL_JSON" | base64 --decode > ./.contentful.json
+          yarn install
+
+      - name: yarn test
+        run: |
+          yarn test
+
+      - name: yarn generate
+        run: |
+          NODE_ENV=production yarn run generate
+
+      - name: collectNotification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
+          SLACK_COLOR: '#008000'
+          SLACK_TITLE: ':rocket::rocket::rocket: Finished distribute to deploygate! :rocket::rocket::rocket:'
+          SLACK_MESSAGE: 'Deploy Finished!'
+          SLACK_USERNAME: 'GitHub Actions'
+          SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
+
+      - name: errorNotification
+        if: failure()
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
+          SLACK_COLOR: '#ff0000'
+          SLACK_TITLE: ':fire::fire::fire: Build error! :fire::fire::fire:'
+          SLACK_MESSAGE: 'Build error! Please check github!'
+          SLACK_USERNAME: 'GitHub Actions'
+          SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
