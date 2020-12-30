@@ -36,6 +36,8 @@
     "@nuxtjs/sitemap": "^2.2.0",
     "@nuxtjs/vuetify": "^1.0.0",
     "cookie-universal-nuxt": "^2.1.2",
+    "firebase": "^8.2.1",
+    "firebase-tools": "^9.1.0",
     "global": "^4.4.0",
     "markdown-it": "^10.0.0",
     "markdown-it-footnote": "^3.0.2",
