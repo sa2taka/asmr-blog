@@ -1,88 +1,38 @@
-export interface Category extends SingleItem {
-  fields: {
-    name: string;
-    slug: string;
-    sort: number;
-  };
+import firebase from 'firebase';
+
+export interface Review extends firebase.firestore.DocumentData {
+  title: string;
+  description: string;
+  body: string;
+  tags: Tag[];
+  slug: string;
+  public: boolean;
+  releaseDate: string;
+  latex: boolean;
 }
 
-export interface Author extends SingleItem {
-  fields: {
-    name: string;
-    icon: string;
-    at: string;
-  };
+export interface Product extends firebase.firestore.DocumentData {
+  name: string;
+  slug: string;
 }
 
-export interface Post extends SingleItem {
-  fields: {
-    title: string;
-    description: string;
-    body: string;
-    author: Author;
-    category: Category;
-    slug: string;
-    tags: string[];
-    postImage: Image;
-    public: boolean;
-    releaseDate: string;
-    latex: boolean;
-  };
+export interface Tag extends firebase.firestore.DocumentData {
+  name: string;
+  slug: string;
 }
 
-export interface Image extends SingleItem {
-  fields: {
-    title: string;
-    file: File;
-  };
+export interface Circle extends firebase.firestore.DocumentData {
+  name: string;
+  slug: string;
 }
 
-export interface File {
-  url: string;
-  detail: any;
-  filename: string;
-  contentType: string;
+export interface Actor extends firebase.firestore.DocumentData {
+  name: string;
+  slug: string;
 }
 
-export interface FileDetail {
-  size: number;
-  image?: {
-    width: number;
-    height: number;
-  };
-}
-
-export interface SingleItem {
-  sys: Sys;
-  fields: any;
-}
-
-export interface MultipleItem<T extends SingleItem> {
-  sys: {
-    type: string;
-  };
-  total: number;
-  skip: number;
-  limit: number;
-  items: T[];
-}
-
-export interface Sys {
-  space: ChildSys;
-  id: string;
-  type: string;
-  createdAt: string;
-  updatedAt: string;
-  environment: ChildSys;
-  revision: number;
-  contentType: ChildSys;
-  locale: string;
-}
-
-interface ChildSys {
-  sys: {
-    id: string;
-    type: string;
-    linkType: string;
-  };
+export interface Comment extends firebase.firestore.DocumentData {
+  username: string;
+  text: string;
+  onlyAdministrator: string;
 }
