@@ -4,7 +4,7 @@ import { BLOG_TITLE, BASE_URL } from './libs/const';
 const nodeExternals = require('webpack-node-externals');
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin');
 
-const config = require('./.contentful.json');
+const firebaseSecret = require('./.firebase-secret.json');
 const isDev = process.env.NODE_ENV === 'development';
 const katexCss = [
   'accent',
@@ -121,6 +121,7 @@ const katexCss = [
 ];
 export default {
   mode: 'universal',
+  target: 'static',
   /*
    ** Headers of the page
    */
@@ -136,7 +137,7 @@ export default {
       {
         name: 'description',
         content:
-          'sa2taka/t0p_lightの独断と偏見が混じった、音声作品紹介サイトです',
+          'sa2taka/t0p_l1ghtの独断と偏見が混じった、音声作品紹介サイトです',
       },
       { hid: 'og:type', property: 'og:type', content: 'website' },
       {
@@ -189,15 +190,15 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['@/plugins/vuetify', '@/plugins/katex'],
+  plugins: [{ src: '@/plugins/vuetify', mode: 'client' }],
   /*
-   ** Nuxt.js dev-modules
+   ** Nuxt.js dev-modulesy
    */
   buildModules: [
     // Doc: https://github.com/nuxt-community/eslint-module
     '@nuxtjs/eslint-module',
     '@nuxt/typescript-build',
-    '@nuxtjs/google-analytics',
+    '@nuxtjs/vuetify',
   ],
   /*
    ** Nuxt.js modules
@@ -248,9 +249,14 @@ export default {
     },
   },
   env: {
-    CTF_CDA_ACCESS_TOKEN: config.CTF_CDA_ACCESS_TOKEN,
-    CTF_CTF_MAIN_AUTHOR_ID: config.CTF_PERSON_ID,
-    CTF_SPACE_ID: config.CTF_SPACE_ID,
+    apiKey: firebaseSecret.apiKey,
+    authDomain: firebaseSecret.authDomain,
+    databaseURL: firebaseSecret.databaseURL,
+    projectId: firebaseSecret.projectId,
+    storageBucket: firebaseSecret.storageBucket,
+    messagingSenderId: firebaseSecret.messagingSenderId,
+    appId: firebaseSecret.appId,
+    measurementId: firebaseSecret.measurementId,
   },
   manifest: {
     name: "園児ニアの庭園 | sa2taka's blog",
@@ -345,9 +351,6 @@ export default {
   typescript: {
     ignoreNotFoundWarnings: true,
     typeCheck: { memoryLimit: 4096 },
-  },
-  googleAnalytics: {
-    id: 'UA-152417689-1',
   },
   vue: {
     config: {

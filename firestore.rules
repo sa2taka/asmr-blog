@@ -16,35 +16,39 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: isAuthentificated()
+      allow read: if isAuthentificated()
             && isUserAuthenticated(userId);
-      allow create, update: isAuthentificated()
+      allow create: if isAuthentificated()
+            && isUserAuthenticated(userId);
+      allow update: if isAuthentificated()
             && isUserAuthenticated(userId);
     }
 
     match /circles/{circleId} {
-      allow read: true;
-      allow write: isAdministrator();
+      allow read: if true;
+      allow write: if isAdministrator();
     }
 
     match /actors/{actorId} {
-      allow read: true;
-      allow write: isAdministrator();
+      allow read: if true;
+      allow write: if isAdministrator();
     }
 
-    match /articles/{articleId} {
-      allow read: true;
-      allow write: isAdministrator();
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdministrator();
     }
 
     match /tags/{tagId} {
-      allow read: true;
-      allow write: isAdministrator();
+      allow read: if true;
+      allow write: if isAdministrator();
     }
 
     match /reviews/{reviewId} {
-      allow read: true;
-      allow write: isAdministrator();
+      allow read: if true;
+      allow create, delete: if isAdministrator();
+      allow update: if isAdministrator()
+          && request.resource.data.createdAt == resource.data.createdAt;
     }
   }
 }

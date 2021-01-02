@@ -4,21 +4,15 @@
 
 <script lang="ts">
 import { Vue, Prop, Component } from 'nuxt-property-decorator';
-import { markdown, addKatex } from '@/libs/markdown';
+import { markdown } from '@/libs/markdown';
 
 @Component
 export default class Markdown extends Vue {
   @Prop({ required: true })
   markdown!: string;
 
-  @Prop({ default: false })
-  latex!: boolean;
-
   get compiledMarkdownText() {
-    let md = markdown;
-    if (this.latex) {
-      md = addKatex(markdown);
-    }
+    const md = markdown;
     return md.render(this.markdown);
   }
 }

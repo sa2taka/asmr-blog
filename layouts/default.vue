@@ -89,7 +89,7 @@
 import { Vue, Component } from 'nuxt-property-decorator';
 import WebpImg from '@/components/Atom/webpImg.vue';
 import DarkThemeSwitch from '@/components/Molecules/darkThemeSwitch.vue';
-import CategoryMenu from '@/components/Organisms/categoryMenu.vue';
+import TagMenu from '@/components/Organisms/tagMenu.vue';
 
 import { BLOG_TITLE } from '@/libs/const';
 
@@ -97,7 +97,7 @@ import { BLOG_TITLE } from '@/libs/const';
   components: {
     WebpImg,
     DarkThemeSwitch,
-    CategoryMenu,
+    TagMenu,
   },
 })
 export default class Default extends Vue {

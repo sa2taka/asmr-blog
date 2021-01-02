@@ -1,6 +1,11 @@
 <template>
   <picture onload="handleLoad()">
-    <source :srcset="webpName" type="image/webp" class="full-width my-auto" />
+    <source
+      v-if="webpName"
+      :srcset="webpName"
+      type="image/webp"
+      class="full-width my-auto"
+    />
     <img
       :src="imgName"
       :width="width"
@@ -17,8 +22,8 @@ import { Vue, Prop, Component } from 'nuxt-property-decorator';
 
 @Component
 export default class WebpImage extends Vue {
-  @Prop({ required: true })
-  webpName!: string;
+  @Prop()
+  webpName!: string | undefined;
 
   @Prop({ required: true })
   imgName!: string;

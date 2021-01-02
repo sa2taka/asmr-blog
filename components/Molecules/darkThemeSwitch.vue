@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-tooltip bottom>
-      <template v-slot:activator="{ on }">
+      <template #activator="{ on }">
         <v-btn
           v-if="isDark"
           icon
@@ -42,11 +42,13 @@ export default class DarkThemeSwitch extends Vue {
   changeTheme(isDark: boolean) {
     this.isDark = isDark;
     this.$vuetify.theme.dark = isDark;
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    this.$cookies.set('theme', isDark ? 'dark' : 'light', {
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    if (localStorage) {
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      this.$cookies.set('theme', isDark ? 'dark' : 'light', {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    }
   }
 }
 </script>

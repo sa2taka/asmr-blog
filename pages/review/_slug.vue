@@ -5,34 +5,21 @@
       <div
         class="post-title-area"
         :style="{
-          'background-image': `url(${post.fields.postImage.fields.file.url}?fm=webp)`,
+          'background-image': `url(${review.product.img})`,
         }"
       >
         <div class="post-title">
-          <nuxt-link
-            class="post-category secondary--text animation-link"
-            :to="{
-              name: 'category-slug',
-              params: { slug: post.fields.category.fields.slug },
-            }"
-            >{{ post.fields.category.fields.name }}</nuxt-link
-          >
-          <h1 class="post-title-name">{{ post.fields.title }}</h1>
-          <p class="post-author">by {{ post.fields.author.fields.name }}</p>
+          <h1 class="post-title-name">{{ review.title }}</h1>
+          <p class="post-author">by {{ review.author }}</p>
         </div>
       </div>
       <div class="date-area">
-        <p class="mb-0 post-date">作成日: {{ postDate }}</p>
+        <p class="mb-0 post-date">作成日: {{ reviewDate }}</p>
         <p class="mb-0 post-date">更新日: {{ updateDate }}</p>
       </div>
-      <post-index :index="postIndex" class="mt-10" />
-      <markdown
-        class="mt-8"
-        :markdown="post.fields.body"
-        :latex="post.fields.latex"
-      />
+      <markdown class="mt-8" :markdown="review.body" />
       <footer class="my-6">
-        <share-buttons :title="post.fields.title" />
+        <share-buttons :title="review.title" />
       </footer>
     </article>
   </v-layout>
@@ -42,44 +29,40 @@
 import { Context } from '@nuxt/types';
 import { Vue, Component } from 'nuxt-property-decorator';
 
-import { fetchPost } from '@/libs/contentful';
-import { Post } from '@/types/entry';
-import { BASE_URL } from '@/libs/const';
-import { generateIndexies } from '@/libs/generateIndexies';
-import { generatePostBreadcrumbsList } from '@/libs/breadcrumbsGenerator';
+import { FullReview } from '@/types/entry';
+import { BASE_URL, BLOG_TITLE } from '@/libs/const';
+import { generateReviewBreadcrumbsList } from '@/libs/breadcrumbsGenerator';
 
 import Markdown from '@/components/Organisms/markdown.vue';
-import PostIndex from '@/components/Molecules/postIndex.vue';
 import Breadcrumbs from '@/components/Atom/breadcrumbs.vue';
 import ShareButtons from '@/components/Molecules/shareButtons.vue';
-// import 'katex/dist/katex.min.css';
+import { fetchFullReviewBySlug } from '~/libs/firebase';
 
 @Component({
   components: {
     Markdown,
-    PostIndex,
     Breadcrumbs,
     ShareButtons,
   },
 })
 export default class PostSlug extends Vue {
-  post!: Post;
+  review!: FullReview;
   async asyncData(context: Context) {
     if (!context.params.slug || context.params.slug === '') {
       return context.error({
         statusCode: 404,
       });
     }
-    const post: Post = await fetchPost(context.params.slug);
+    const review = await fetchFullReviewBySlug(context.params.slug);
 
-    if (!post) {
+    if (!review) {
       return context.error({
         statusCode: 404,
       });
     }
 
     return {
-      post,
+      review,
     };
   }
 
@@ -89,28 +72,26 @@ export default class PostSlug extends Vue {
     window.location.hash = hash;
   }
 
-  get postDate() {
-    const rawDate = this.post.sys.createdAt;
+  get reviewDate() {
+    const seconds = this.review.createdAt.seconds;
+    const millseconds = parseInt(`${seconds.toString()}000`);
 
-    return formatDate(new Date(rawDate));
+    return formatDate(new Date(millseconds));
   }
 
   get updateDate() {
-    const rawDate = this.post.sys.updatedAt;
+    const seconds = this.review.updatedAt.seconds;
+    const millseconds = parseInt(`${seconds.toString()}000`);
 
-    return formatDate(new Date(rawDate));
-  }
-
-  get postIndex() {
-    return generateIndexies(this.post.fields.body);
+    return formatDate(new Date(millseconds));
   }
 
   get ogImage() {
-    return this.post.fields.postImage.fields.file.url + '?w=1200';
+    return this.review.product.img;
   }
 
   get breadcrumbsList() {
-    return generatePostBreadcrumbsList(this.post);
+    return generateReviewBreadcrumbsList(this.review);
   }
 
   get seoStructureData() {
@@ -121,13 +102,13 @@ export default class PostSlug extends Vue {
         '@type': 'WebPage',
         '@id': BASE_URL + this.$route.path,
       },
-      headline: this.post.fields.title,
+      headline: this.review.title,
       image: [this.ogImage],
-      datePublished: this.post.sys.createdAt.toString(),
-      dateModified: this.post.sys.updatedAt.toString(),
+      datePublished: this.review.createdAt.toString(),
+      dateModified: this.review.updatedAt.toString(),
       author: {
         '@type': 'Person',
-        name: this.post.fields.author.fields.name,
+        name: this.review.author,
       },
       publisher: {
         '@type': 'Organization',
@@ -143,7 +124,7 @@ export default class PostSlug extends Vue {
   head() {
     const link = [];
     const hid = 'article';
-    if (this.post.fields.latex) {
+    if (this.review.latex) {
       link.push({
         rel: 'stylesheet',
         href: 'https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css',
@@ -161,22 +142,22 @@ export default class PostSlug extends Vue {
           src: 'highlight.js/styles/atom-one-dark.css',
         },
       ],
-      title: this.post.fields.title + ' - ',
+      title: this.review.title + ' - ',
       meta: [
         {
           hid: 'description',
           name: 'description',
-          content: this.post.fields.description,
+          content: this.review.description,
         },
         {
           hid: 'og:title',
           name: 'og:title',
-          content: this.post.fields.title + ' - 園児ニアの庭園',
+          content: this.review.title + ' - ' + BLOG_TITLE,
         },
         {
           hid: 'og:description',
           name: 'og:description',
-          content: this.post.fields.description,
+          content: this.review.description,
         },
         {
           hid: 'og:image',

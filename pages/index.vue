@@ -1,41 +1,35 @@
 <template>
   <v-layout column justify-center align-center>
-    <posts :posts="posts" />
+    <reviews :reviews="reviews" />
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types';
 import { Vue, Component } from 'nuxt-property-decorator';
-import { fetchPosts } from '@/libs/contentful';
-import { Post, MultipleItem } from '@/types/entry';
-import Posts from '@/components/Organisms/posts.vue';
+import { FullReview } from '@/types/entry';
+import { fetchFullReviews } from '~/libs/firebase';
+import Reviews from '@/components/Organisms/reviews.vue';
 
 @Component({
   components: {
-    Posts,
+    Reviews,
   },
 })
 export default class IndexPage extends Vue {
   page!: number;
   limit = 20;
-  posts!: Post[];
+  reviews!: FullReview[];
 
   async asyncData(context: Context) {
     const page = decidePage(context);
-    const limit = 20; // hard code because "this" is not accessable
+    // const limit = 20; // hard code because "this" is not accessable
 
-    const posts: Post[] = await fetchPosts(page, limit).then(
-      (posts: MultipleItem<Post>) =>
-        posts.items.map((item) => {
-          item.fields.body = '';
-          return item;
-        })
-    );
+    const reviews = await fetchFullReviews();
 
     return {
       page,
-      posts,
+      reviews,
     };
   }
 }

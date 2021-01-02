@@ -1,4 +1,4 @@
-import { Category, Post } from '@/types/entry';
+import { Tag, FullReview, Circle } from '@/types/entry';
 
 export interface BreadcrumbsItem {
   disabled?: boolean;
@@ -19,39 +19,69 @@ export const topPageItem: BreadcrumbsItem = {
   to: '/',
 };
 
-export const generateCategoriesItem = () => {
+export const generateCircleItem = () => {
   return {
     disabled: false,
     exact: true,
     link: true,
-    text: 'カテゴリ一覧',
-    to: '/category',
+    text: 'サークル一覧',
+    to: '/circle',
   };
 };
 
-export const generateCategoriesBreadcrumbsList = () => {
-  const item = generateCategoriesItem();
+export const generateTagItem = () => {
+  return {
+    disabled: false,
+    exact: true,
+    link: true,
+    text: 'タグ一覧',
+    to: '/tag',
+  };
+};
+
+export const generateCirclesBreadcrumbsList = () => {
+  const item = generateCircleItem();
   item.disabled = true;
   return [topPageItem, item];
 };
 
-export const generateCategoryBreadcrumbsList = (category: Category) => {
-  const list: BreadcrumbsList = [topPageItem, generateCategoriesItem()];
-  const categoryItem: BreadcrumbsItem = {
+export const generateTagsBreadcrumbsList = () => {
+  const item = generateTagItem();
+  item.disabled = true;
+  return [topPageItem, item];
+};
+
+export const generateCircleBreadcrumbsList = (circle: Circle) => {
+  const list: BreadcrumbsList = [topPageItem, generateCircleItem()];
+  const circleItem: BreadcrumbsItem = {
     disabled: true,
     exact: true,
     link: true,
-    text: category.fields.name,
-    to: `/category/${category.fields.slug}`,
+    text: circle.name,
+    to: `/circle/${circle.slug}`,
   };
-  list.push(categoryItem);
+  list.push(circleItem);
 
   return list;
 };
 
-export const generatePostBreadcrumbsList = (post: Post) => {
-  const list: BreadcrumbsList = generateCategoryBreadcrumbsList(
-    post.fields.category
+export const generateTagBreadcrumbsList = (tag: Tag) => {
+  const list: BreadcrumbsList = [topPageItem, generateCircleItem()];
+  const circleItem: BreadcrumbsItem = {
+    disabled: true,
+    exact: true,
+    link: true,
+    text: tag.name,
+    to: `/tag/${tag.slug}`,
+  };
+  list.push(circleItem);
+
+  return list;
+};
+
+export function generateReviewBreadcrumbsList(review: FullReview) {
+  const list: BreadcrumbsList = generateCircleBreadcrumbsList(
+    review.product.circle
   );
   list[list.length - 1].disabled = false;
 
@@ -59,10 +89,10 @@ export const generatePostBreadcrumbsList = (post: Post) => {
     disabled: true,
     exact: true,
     link: true,
-    text: post.fields.title,
-    to: `/post/${post.fields.slug}`,
+    text: review.title,
+    to: `/review/${review.slug}`,
   };
   list.push(psotItem);
 
   return list;
-};
+}

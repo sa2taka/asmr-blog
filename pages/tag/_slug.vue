@@ -1,64 +1,53 @@
 <template>
   <v-layout column justify-center align-center>
     <breadcrumbs :list="breadcrumbsList"></breadcrumbs>
-    <div class="category-title">{{ category.fields.name }}</div>
-    <posts :posts="posts" />
+    <div class="tag-title">{{ tag.name }}</div>
+    <posts :posts="reviews" />
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Context } from '@nuxt/types';
 import { Vue, Component } from 'nuxt-property-decorator';
-import { fetchPostInCategory } from '@/libs/contentful';
-import { Post, MultipleItem, Category } from '@/types/entry';
-import { generateCategoryBreadcrumbsList } from '@/libs/breadcrumbsGenerator';
+import { Review, Tag } from '@/types/entry';
+import { generateTagBreadcrumbsList } from '@/libs/breadcrumbsGenerator';
 
-import Posts from '@/components/Organisms/posts.vue';
+import Reviews from '@/components/Organisms/reviews.vue';
 import Breadcrumbs from '@/components/Atom/breadcrumbs.vue';
+import { fetchReviewContainsTag, fetchTagBySlug } from '~/libs/firebase';
 
 @Component({
   components: {
-    Posts,
+    Reviews,
     Breadcrumbs,
   },
 })
 export default class CategorySlug extends Vue {
-  posts!: Post[];
+  reviews!: Review[];
   page!: number;
-  category!: Category;
+  tag!: Tag;
 
   async asyncData(context: Context) {
     const page = decidePage(context);
-    const limit = 20; // hard code because "this" is not access
-    const category = context.store.state.categories.categories.find(
-      (category: Category) => category.fields.slug === context.route.params.slug
-    );
+    // const limit = 20; // hard code because "this" is not access
 
-    const posts: Post[] = await fetchPostInCategory(
-      context.route.params.slug,
-      page,
-      limit
-    ).then((posts: MultipleItem<Post>) =>
-      posts.items.map((item) => {
-        item.fields.body = '';
-        return item;
-      })
-    );
+    const tag = await fetchTagBySlug(context.params.slug);
+    const reviews = await fetchReviewContainsTag(tag.id);
 
     return {
       page,
-      posts,
-      category,
+      reviews,
+      tag,
     };
   }
 
   get breadcrumbsList() {
-    return generateCategoryBreadcrumbsList(this.category);
+    return generateTagBreadcrumbsList(this.tag);
   }
 
   head() {
     return {
-      title: this.category.fields.name + ' カテゴリ - ',
+      title: this.tag.name + ' - ',
       meta: [{ name: 'robots', content: 'noindex,nofollow' }],
     };
   }
@@ -86,7 +75,7 @@ const decidePage = (context: Context) => {
 </script>
 
 <style scoped>
-.category-title {
+.tag-title {
   font-size: 1.4em;
 }
 </style>

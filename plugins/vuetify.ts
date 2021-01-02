@@ -9,10 +9,10 @@ Vue.use(Vuetify);
 
 export default (ctx: Context) => {
   let isDark = true;
-  if (ctx.req) {
-    isDark = !ctx.req.headers.cookie?.match(/theme=light/);
-  } else {
+  if (localStorage) {
     isDark = localStorage.getItem('theme') !== 'light';
+  } else {
+    isDark = !ctx.req.headers.cookie?.match(/theme=light/);
   }
 
   const vuetify = new Vuetify({

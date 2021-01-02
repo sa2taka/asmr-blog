@@ -4,6 +4,7 @@ module.exports = {
     browser: true,
     node: true,
   },
+  parser: "vue-eslint-parser",
   parserOptions: {
     parser: '@typescript-eslint/parser',
   },
@@ -11,16 +12,14 @@ module.exports = {
     '@nuxtjs/eslint-config-typescript',
     'prettier',
     'prettier/vue',
-    'plugin:prettier/recommended',
     'plugin:nuxt/recommended',
   ],
-  plugins: ['prettier'],
+  plugins: ['vue'],
   // add your custom rules here
   rules: {
     'nuxt/no-cjs-in-config': 'off',
     'import/no-mutable-exports': 'off',
     'vue/no-v-html': 'off',
-    'prettier/prettier': 'error',
   },
   ignorePatterns: ['static/', 'node_modules/', '.nuxt/'],
 };

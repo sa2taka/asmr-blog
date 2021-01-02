@@ -91,3 +91,4 @@ sw.*
 
 .contentful.json
 .env.yaml
+.firebase-secret.json

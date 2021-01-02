@@ -1,44 +1,40 @@
 <template>
   <article @mouseenter="addPrerender">
     <v-card
-      class="post-card mx-auto d-flex flex-column-reverse flex-sm-row"
+      class="review-card mx-auto d-flex flex-column-reverse flex-sm-row"
       hover
-      :to="{ name: 'post-slug', params: { slug: post.fields.slug } }"
+      :to="{ name: 'review-slug', params: { slug: review.slug } }"
       :max-width="maxWidth"
     >
       <div class="flex-3 d-flex flex-column">
-        <v-card-text
-          class="secondary--text top-post-category mt-4 mb-n3 d-none d-sm-block"
+        <!-- <v-card-text
+          class="secondary--text top-review-category mt-4 mb-n3 d-none d-sm-block"
         >
-          {{ post.fields.category.fields.name }}
-        </v-card-text>
-        <v-card-title class="card-title">{{ post.fields.title }}</v-card-title>
+          {{ review.tag.name }}
+        </v-card-text> -->
+        <v-card-title class="card-title">{{ review.title }}</v-card-title>
         <v-card-subtitle class="card-sub-title">{{
-          post.fields.description
+          review.description
         }}</v-card-subtitle>
         <v-spacer />
-        <v-card-text class="mb-0 py-0 post-date d-none d-sm-block"
-          >作成日：{{ postDate }}</v-card-text
+        <v-card-text class="mb-0 py-0 review-date d-none d-sm-block"
+          >作成日：{{ reviewDate }}</v-card-text
         >
-        <v-card-text class="mb-2 py-0 mt-0 post-date d-none d-sm-block"
+        <v-card-text class="mb-2 py-0 mt-0 review-date d-none d-sm-block"
           >更新日：{{ updateDate }}</v-card-text
         >
       </div>
 
       <div class="d-flex flex-2 my-2 mx-auto">
         <div class="my-auto flex-1 d-sm-none">
-          <v-card-text class="mb-2 py-0 mt-0 post-date">{{
+          <v-card-text class="mb-2 py-0 mt-0 review-date">{{
             updateDate
           }}</v-card-text>
           <v-spacer />
-          <div class="secondary--text top-post-category">
-            {{ post.fields.category.fields.name }}
-          </div>
         </div>
 
         <webp-img
-          :webp-name="generateWebp(post.fields.postImage.fields.file.url)"
-          :img-name="generateFormatedImg(post.fields.postImage.fields.file.url)"
+          :img-name="generateFormatedImg(review.product.img)"
           :alt="altText"
           :on-load="onLoad"
           class="flex-1 mx-2"
@@ -50,7 +46,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator';
-import { Post } from '@/types/entry';
+import { FullReview } from '@/types/entry';
 
 const WebpImg = () => import('@/components/Atom/webpImg.vue');
 
@@ -59,9 +55,9 @@ const WebpImg = () => import('@/components/Atom/webpImg.vue');
     WebpImg,
   },
 })
-export default class CardPost extends Vue {
+export default class CardReview extends Vue {
   @Prop({ required: true })
-  post!: Post;
+  review!: FullReview;
 
   isActive = false;
   loading = true;
@@ -83,7 +79,7 @@ export default class CardPost extends Vue {
   addPrerender() {
     const elementId = 'prerendering-header';
     const oldLink = document.getElementById(elementId);
-    const href = `/post/${this.post.fields.slug}`;
+    const href = `/review/${this.review.slug}`;
 
     if (oldLink) {
       const oldHref = oldLink.attributes.getNamedItem('href');
@@ -99,19 +95,21 @@ export default class CardPost extends Vue {
   }
 
   get altText() {
-    return `${this.post.fields.postImage.fields.title} - ${this.post.fields.title}のタイトル画像`;
+    return `${this.review.title}のタイトル画像`;
   }
 
-  get postDate() {
-    const rawDate = this.post.sys.createdAt;
+  get reviewDate() {
+    const seconds = this.review.createdAt.seconds;
+    const millseconds = parseInt(`${seconds.toString()}000`);
 
-    return formatDate(new Date(rawDate));
+    return formatDate(new Date(millseconds));
   }
 
   get updateDate() {
-    const rawDate = this.post.sys.updatedAt;
+    const seconds = this.review.updatedAt.seconds;
+    const millseconds = parseInt(`${seconds.toString()}000`);
 
-    return formatDate(new Date(rawDate));
+    return formatDate(new Date(millseconds));
   }
 }
 
@@ -128,7 +126,7 @@ const formatDate = (date: Date) => {
 </script>
 
 <style scoped>
-.top-post-category {
+.top-review-category {
   font-size: 14px;
   font-weight: z00;
   padding-left: 16px;
@@ -149,17 +147,17 @@ const formatDate = (date: Date) => {
   font-weight: 600;
 }
 
-.theme--dark .post-date,
+.theme--dark .review-date,
 .theme--dark .card-sub-title {
   color: #ccc;
 }
 
-.theme--light .post-date,
+.theme--light .review-date,
 .theme--light .card-sub-title {
   color: #222;
 }
 
-.post-img {
+.review-img {
   width: 50%;
 }
 </style>
