@@ -18,8 +18,7 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthentificated()
             && isUserAuthenticated(userId);
-      allow create: if isAuthentificated()
-            && isUserAuthenticated(userId);
+      allow create: if true;
       allow update: if isAuthentificated()
             && isUserAuthenticated(userId);
     }
